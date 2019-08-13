@@ -1,13 +1,20 @@
 import React from 'react';
 import './App.css';
 import Dot from './components/dots';
+import Menu from './components/menu/menu';
+import BodyNav from './components/menu/bodyNav';
+import { relative } from 'path';
+import {Route, Switch} from 'react-router-dom'
+import Rule from './components/rule/rule';
+
+
 
 function creatDots() {
   const createState = []
   for (let i = 0; i < 10; i++) {
     createState[i] = []
     for (let j = 0; j < 10; j++) {
-      createState[i][j] = {color: 'transparent', disabled:false, id:i+'_'+j}
+      createState[i][j] = {color: 'transparent', disabled:false, id:i+'_'+j, opacity: 1}
 
     }
   }
@@ -22,6 +29,10 @@ class App extends React.Component{
       dots: creatDots(),
       player: 1,
       lines: [],
+      menu:false,
+      count_player_1:0,
+      count_player_2:0,
+
     }
   }
 
@@ -38,41 +49,72 @@ class App extends React.Component{
       for (let x0 = 0; x0 < this.state.dots[y0].length; x0 += 1) {
         const dot =  this.state.dots[y0][x0];
 
-        if (dot.color !== 'transparent' && !dot.disable) {
+        if (dot.color !== 'transparent' /* !dot.disable*/) {
           const needColor = dot.color === 'red' ? 'blue' : 'red';
 
          function funcIf (y0,x0){
             let resultDy;
-            let length;
-            if(y0===0 || x0===0){
-              resultDy = 0;
-              length=2
-            }
-            else if(y0===9){
-              resultDy=1
-              length=0
-            }
-            else if(x0===9){
+            let lengthY;
+            let resultDx;
+            let lengthX;
+            if(y0===0 && x0===0){
+              resultDy=0;
+              lengthY=2;
+              resultDx=0;
+              lengthX=2;
+            }else if(y0===0 && x0===9){
+              resultDy=0;
+              lengthY=2;
+              resultDx=-1;
+              lengthX=1;
+            }else if(y0===9 && x0===0){
               resultDy=-1;
-              length=0
-            }
-            else{
-              resultDy=-1
-              length=2
+              lengthY=1;
+              resultDx=0;
+              lengthX=2;
+            }else if(y0===9 && x0===9){
+              resultDy=-1;
+              lengthY=1;
+              resultDx=-1;
+              lengthX=1;
+            }else if(y0===0){
+              resultDy = 0;
+              lengthY=2;
+              resultDx=-1;
+              lengthX=2;
+            }else if(y0===9){
+              resultDy=-1;
+              lengthY=1;
+              resultDx=-1;
+              lengthX=2;
+            }else if(x0===0){
+              resultDy=-1;
+              lengthY=2;
+              resultDx=0;
+              lengthX=2;
+            }else if(x0===9){
+              resultDy=-1;
+              lengthY=2;
+              resultDx=-1;
+              lengthX=1;
+            }else{
+              resultDy=-1;
+              lengthY=2;
+              resultDx=-1;
+              lengthX=2;
             }
 
-            return {cycleValue:resultDy, cycleLength:length}
+            return {cycleValueY:resultDy, cycleLengthY:lengthY, cycleValueX:resultDx, cycleLengthX:lengthX}
           };
          const resultFuncIf = funcIf(y0,x0)
           
-         
-          out: for (let dy = resultFuncIf.cycleValue; dy < resultFuncIf.cycleLength; dy += 1) {
-                 for (let dx = resultFuncIf.cycleValue; dx < resultFuncIf.cycleLength; dx += 1) {
+
+          out: for (let dy = resultFuncIf.cycleValueY; dy < resultFuncIf.cycleLengthY; dy += 1) {
+                 for (let dx = resultFuncIf.cycleValueX; dx < resultFuncIf.cycleLengthX; dx += 1) {
 
 
               if (this.state.dots[y0 + dy][x0 + dx].color === needColor) {
                 const result = this.rec(needColor, -1, -1,  y0 + dy, x0 + dx, []);
-                // console.log(y0)
                 let a = [false, false, false, false];
 
                 for (let i = 0; i < result.length; i += 1) {
@@ -93,9 +135,8 @@ class App extends React.Component{
                 }
                 
                 if (result && result.length >= 4 && a[0] && a[1] && a[2] && a[3]) {
-                  console.log(result);
-                
-                  dot.disabled = true;
+                  dot.opacity = 0.5
+                  // dot.disabled = true;
                   
 
                   for (let i = 0; i < result.length - 1; i += 1) {
@@ -103,9 +144,13 @@ class App extends React.Component{
                   }
 
                   this.state.lines.push([result[result.length - 1].split('-'), result[0].split('-'), needColor]);
-
+                  
                   break out;
+                  
                 }
+                
+                  
+               
               }
            }
           }
@@ -113,6 +158,7 @@ class App extends React.Component{
         }
       }
     }
+     
 
     this.forceUpdate();
   }
@@ -123,28 +169,61 @@ class App extends React.Component{
     function funcIfRec (y,x){
       let resultRecY;
       let lengthY;
-            if(y===0 || x===0){
-              resultRecY = 0;
-              lengthY=2
-            }else if(y===9){
-              resultRecY=-1
-              lengthY=0
-            }
-            else if(x===9){
+      let resultRecX;
+      let lengthX;
+            if(y===0 && x===0){
+              resultRecY=0;
+              lengthY=2;
+              resultRecX=0;
+              lengthX=2;
+            }else if(y===0 && x===9){
+              resultRecY=0;
+              lengthY=2;
+              resultRecX=-1;
+              lengthX=1;
+            }else if(y===9 && x===0){
               resultRecY=-1;
-              lengthY=0
-            }
-            else{
-              resultRecY=-1
-              lengthY=2
+              lengthY=1;
+              resultRecX=0;
+              lengthX=2;
+            }else if(y===9 && x===9){
+              resultRecY=-1;
+              lengthY=1;
+              resultRecX=-1;
+              lengthX=1;
+            }else if(y===0){
+              resultRecY = 0;
+              lengthY=2;
+              resultRecX=-1;
+              lengthX=2;
+            }else if(y===9){
+              resultRecY=-1;
+              lengthY=1;
+              resultRecX=-1;
+              lengthX=2;
+            }else if(x===0){
+              resultRecY=-1;
+              lengthY=2;
+              resultRecX=0;
+              lengthX=2;
+            }else if(x===9){
+              resultRecY=-1;
+              lengthY=2;
+              resultRecX=-1;
+              lengthX=1;
+            }else{
+              resultRecY=-1;
+              lengthY=2;
+              resultRecX=-1;
+              lengthX=2;
             }
 
-            return {cycleValue:resultRecY, cycleLength:lengthY}
+            return {cycleValueY:resultRecY, cycleLengthY:lengthY, cycleValueX:resultRecX, cycleLengthX:lengthX}
     };
     const resultFuncIfRec = funcIfRec (y,x)
 
-    for (let dy = resultFuncIfRec.cycleValue; dy < resultFuncIfRec.cycleLength; dy += 1) {
-      for (let dx = resultFuncIfRec.cycleValue; dx < resultFuncIfRec.cycleLength; dx += 1) {
+    for (let dy = resultFuncIfRec.cycleValueY; dy < resultFuncIfRec.cycleLengthY; dy += 1) {
+      for (let dx = resultFuncIfRec.cycleValueX; dx < resultFuncIfRec.cycleLengthX; dx += 1) {
         if (dy === 0 && dx === 0) {
           continue;
         }
@@ -152,7 +231,7 @@ class App extends React.Component{
           return visited;
         }
 
-        if (this.state.dots[y + dy][x + dx].color === color && !this.state.dots[y + dy][x + dx].disabled && visited.indexOf(`${y + dy}-${x + dx}`) === -1) {
+        if (this.state.dots[y + dy][x + dx].color === color /*&& !this.state.dots[y + dy][x + dx].disabled*/ && visited.indexOf(`${y + dy}-${x + dx}`) === -1) {
           const result = this.rec(color,
             fy === -1 ? y : fy,
             fx === -1 ? x : fx,
@@ -171,7 +250,7 @@ class App extends React.Component{
   onClick(i, j) {
     const change = this.state.dots[i][j]
     change.color = this.colorChange();
-    // change.disabled= true;
+    change.disabled= true;
 
 
     this.logic();
@@ -184,11 +263,26 @@ class App extends React.Component{
     
   }
 
+  menuFunc=()=>{
+    this.setState({
+      menu: !this.state.menu
+    })
+  }
+
 
   render() {
-    
+    console.log(this.state.menu)
     return (
-      <div id="battlefield">
+      <div style={{position:relative}}>
+        <BodyNav
+          open={this.state.menu}
+        />
+        <Menu
+          menuClick={this.menuFunc}
+          open={this.state.menu}
+        />
+      {/* <div id="battlefield">
+        
         {this.state.dots.map((row, i) =>
           row.map((cell, j) => (
             <Dot
@@ -199,6 +293,7 @@ class App extends React.Component{
               disab={this.state.dots[i][j].disabled}
               id={'' + i + '_' + j}
               key={'' + i + j}
+
             />
           ))
         )}
@@ -215,7 +310,42 @@ class App extends React.Component{
             />
           ))}
         </svg>
+        </div> */}
+        <Switch>
+        <Route path='/' exact render={()=>
+                <div id="battlefield">
         
+                {this.state.dots.map((row, i) =>
+                  row.map((cell, j) => (
+                    <Dot
+                      onClick={() => this.onClick(i, j)}
+                      top={i}
+                      left={j}
+                      color={this.state.dots[i][j].color}
+                      disab={this.state.dots[i][j].disabled}
+                      id={'' + i + '_' + j}
+                      key={'' + i + j}
+        
+                    />
+                  ))
+                )}
+                <svg viewBox="0 0 500 500" style={{ position: 'absolute', pointerEvents: 'none' }}>
+                  {this.state.lines.map((line, key) => (
+                    <line
+                      key={key}
+                      x1={line[0][1] * 50}
+                      y1={line[0][0] * 50}
+                      x2={line[1][1] * 50}
+                      y2={line[1][0] * 50}
+                      strokeWidth={3}
+                      stroke={line[2]}
+                    />
+                  ))}
+                </svg>
+                </div>
+        } />
+        <Route path="/rule" component={Rule} />
+        </Switch>
       </div>
     )
   }

@@ -1,0 +1,40 @@
+.menu{
+    position:fixed;
+    top: 40px;
+    left:40px;
+    font-size:20px;
+    color: #65ca93;
+    transition: all .35s ease-in;
+    z-index: 200;
+}
+.menu:hover{
+    opacity: 0.8
+}
+.open{
+    left:320px
+}
+.body-nav{
+    position: fixed;
+    top: 0;
+    left:0;
+    bottom: 0;
+    width:300px;
+    padding: 10px;
+    background: #65ca93;
+    box-sizing: border-box;
+    z-index: 190;
+    transform: translateX(0px);
+    transition: all .35s ease-in;
+}
+.close{
+    transform: translateX(-300px);
+}
+ul{
+    list-style-type: none;
+    font-size: 20px;
+    color:black;
+    margin-top: 50px;
+}
+ul li{
+    margin: 12px;
+}

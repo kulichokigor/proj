@@ -1,0 +1,17 @@
+h1{
+    color:#65ca93;
+    text-align: center;
+}
+p{
+    color:#65ca93;
+    text-align: justify;
+}
+.rule-can{
+    width:600px;
+    height: auto;
+    text-align: center;
+    margin: 15px auto;
+    border: 5px solid rgb(101, 202, 147);
+    box-shadow: 0 0 20px rgb(101, 202, 147);
+    padding: 10px;
+}
